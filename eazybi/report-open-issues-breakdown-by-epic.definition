@@ -1,0 +1,10 @@
+{
+  "cube_name": "Issues",
+  "cube_reports": [ {
+     "name": "Open Issues Breakdown By Epic",
+     "folder_name": "Standard",
+     "result_view": "pie_chart",
+     "definition": {"columns":{"dimensions":[{"name":"Measures","selected_set":["[Measures].[Open issues]"],"members":[]}]},"rows":{"dimensions":[{"name":"Issue","selected_set":["[Issue.Epic].[Epic].Members"],"members":[],"bookmarked_members":[]}],"order_by":{"expression":["[Measures].[Open issues]"],"order":"ASC"},"filter_by":{"conditions":[{"expression":["[Measures].[Open issues]"],"operator":"\u003e","value":"0"}]},"nonempty_crossjoin":true},"pages":{"dimensions":[]},"options":{},"view":{"current":"pie_chart","maximized":false,"pie_chart":{"swap_axes":false,"donut":true,"show_legend":true,"show_labels":true,"data_labels":"values_percentage","relative_size":false,"series_options":{},"show_full_caption":["Issue.Epic"]},"table":{}},"calculated_members":[],"description":"Open Issues Breakdown By Epic\n---\nShows Unresolved Issues By EPIC"}
+  } ],
+  "calculated_members": [{"dimension":"Measures","name":"Open issues","format_string":"#,##0","formula":"CASE WHEN [Issue].CurrentMember.Level.Name \u003c\u003e 'Issue' THEN\n  Cache(\n    NonZero(Sum(PreviousPeriods([Time].CurrentHierarchyMember),\n      [Measures].[Issues created]\n      - [Measures].[Issues resolved]\n    ))\n    + [Measures].[Issues created]\n    - [Measures].[Issues resolved]\n  )\nWHEN [Time].CurrentHierarchyMember IS [Time].CurrentHierarchy.DefaultMember\nTHEN NonZero([Measures].[Issues due])\nELSE\n  -- optimized formula for drill through Issue\n  NonZero(IIF(\n      DateBeforePeriodEnd(\n        [Issue].CurrentMember.get('Created at'),\n        [Time].CurrentHierarchyMember) AND\n      NOT DateBeforePeriodEnd(\n        [Issue].CurrentMember.get('Resolved at'),\n        [Time].CurrentHierarchyMember),\n    ([Time].CurrentHierarchy.DefaultMember,\n      [Measures].[Issues created]),\n    0\n  ))\nEND"}]
+}
